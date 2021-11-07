@@ -188,7 +188,7 @@ export default class AdvancedBlanks extends (H5P.Question as { new(): any; }) {
 
     if (!this.settings.autoCheck) {
       // Check answer button
-      this.addButton('check-answer', this.localization.getTextFromLabel(LocalizationLabels.checkAllButton),
+      this.addButton('check-answer', 'Submit Answers',
         this.onCheckAnswer, true, {}, {
           confirmationDialog: {
             enable: this.settings.confirmCheckDialog,
@@ -230,6 +230,7 @@ export default class AdvancedBlanks extends (H5P.Question as { new(): any; }) {
     this.showFeedback();
 
     this.toggleButtonVisibility(this.state);
+    this.triggerXAPIScored(this.getScore(true), this.getMaxScore(), "submitted-curriki");
   }
 
   private transitionState = () => {
@@ -313,8 +314,10 @@ export default class AdvancedBlanks extends (H5P.Question as { new(): any; }) {
     return this.answered || this.clozeController.maxScore === 0;
   }
 
-  public getScore = (): number => {
-    this.onCheckAnswer();
+  public getScore = (fromCheckAnswer): number => {
+    if(!fromCheckAnswer) {
+      this.onCheckAnswer();
+    }
     return this.clozeController.currentScore;
   }
 
