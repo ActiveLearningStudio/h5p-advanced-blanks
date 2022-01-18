@@ -13,6 +13,7 @@ enum States {
   ongoing = 'ongoing',
   checking = 'checking',
   showingSolutions = 'showing-solution',
+  submittedAnswers = 'submitted-answer',
   finished = 'finished',
   showingSolutionsEmbedded = 'showing-solution-embedded'
 }
@@ -35,6 +36,15 @@ export default class AdvancedBlanks extends (H5P.Question as { new(): any; }) {
    * Indicates if user has entered any answer so far.
    */
   private answered: boolean = false;
+  /**
+   * Indicates if user has submitted answer.
+   */
+  private submitted: boolean = false;
+
+  /**
+   * Indicates if user is in show solution mode.
+   */
+  private showSolutionMode: boolean = false;
 
   /**
    * @constructor
@@ -188,7 +198,7 @@ export default class AdvancedBlanks extends (H5P.Question as { new(): any; }) {
 
     if (!this.settings.autoCheck) {
       // Check answer button
-      this.addButton('check-answer', 'Submit Answers',
+      this.addButton('check-answer', 'Check Answers',
         this.onCheckAnswer, true, {}, {
           confirmationDialog: {
             enable: this.settings.confirmCheckDialog,
@@ -197,6 +207,12 @@ export default class AdvancedBlanks extends (H5P.Question as { new(): any; }) {
             $parentElement: $container
           }
         });
+    }
+
+    if(!this.settings.disableSubmitButton) {
+      // Submit answer button
+      this.addButton('submit-answer', this.localization.getTextFromLabel(LocalizationLabels.submitAnswerButton),
+          this.onSubmitAnswer, true);
     }
 
     // Show solution button
@@ -230,8 +246,25 @@ export default class AdvancedBlanks extends (H5P.Question as { new(): any; }) {
     this.showFeedback();
 
     this.toggleButtonVisibility(this.state);
-    this.triggerXAPIScored(this.getScore(true), this.getMaxScore(), "submitted-curriki");
-  }
+
+    this.triggerXAPICompleted();
+  };
+
+  private onSubmitAnswer = () => {
+    this.state = States.submittedAnswers;
+    this.toggleButtonVisibility(this.state);
+    this.triggerXAPISubmittedCurriki();
+    var $submit_message = '<div class="submit-answer-feedback" style = "color: red">Result has been submitted successfully</div>';
+    H5P.jQuery('.h5p-question-buttons').after($submit_message);
+  };
+
+  /**
+   * Remove submit answer feedback div
+   */
+  private removeSubmitAnswerFeedback =  () => {
+    H5P.jQuery('.submit-answer-feedback').remove();
+  };
+
 
   private transitionState = () => {
     if (this.clozeController.isSolved) {
@@ -240,17 +273,23 @@ export default class AdvancedBlanks extends (H5P.Question as { new(): any; }) {
   }
 
   private onShowSolution = () => {
+    this.showSolutionMode = true;
     this.moveToState(States.showingSolutions);
     this.clozeController.showSolutions();
     this.showFeedback();
-  }
+  };
 
   private onRetry = () => {
+    /* XAPI restart the activityStartTime */
+    this.setActivityStarted();
     this.removeFeedback();
+    this.removeSubmitAnswerFeedback();
     this.clozeController.reset();
     this.answered = false;
+    this.showSolutionMode = false;
+    this.submitted = false;
     this.moveToState(States.ongoing);
-  }
+  };
 
   private showFeedback() {
     var scoreText = H5P.Question.determineOverallFeedback(this.localization.getObjectForStructure(LocalizationStructures.overallFeedback), this.clozeController.currentScore / this.clozeController.maxScore).replace('@score', this.clozeController.currentScore).replace('@total', this.clozeController.maxScore);
@@ -269,8 +308,8 @@ export default class AdvancedBlanks extends (H5P.Question as { new(): any; }) {
 
   private toggleButtonVisibility(state: States) {
     if (this.settings.enableSolutionsButton) {
-      if (((state === States.checking)
-        || (this.settings.autoCheck && state === States.ongoing))
+      if (!this.showSolutionMode && ((state === States.checking)
+        || (this.settings.autoCheck && state === States.ongoing) || (state === States.submittedAnswers))
         && (!this.settings.showSolutionsRequiresInput || this.clozeController.allBlanksEntered)) {
         this.showButton('show-solution');
       }
@@ -279,7 +318,7 @@ export default class AdvancedBlanks extends (H5P.Question as { new(): any; }) {
       }
     }
 
-    if (this.settings.enableRetry && (state === States.checking || state === States.finished || state === States.showingSolutions)) {
+    if (this.settings.enableRetry && (state === States.checking || state === States.finished || state === States.showingSolutions || state === States.submittedAnswers)) {
       this.showButton('try-again');
     }
     else {
@@ -294,10 +333,19 @@ export default class AdvancedBlanks extends (H5P.Question as { new(): any; }) {
       this.hideButton('check-answer');
     }
 
+    if(!this.settings.disableSubmitButton) {
+      if(!this.submitted && (state === States.checking || state === States.showingSolutions)) {
+        this.showButton('submit-answer');
+      } else {
+        this.hideButton('submit-answer');
+      }
+    }
+
     if (state === States.showingSolutionsEmbedded) {
       this.hideButton('check-answer');
       this.hideButton('try-again');
       this.hideButton('show-solution');
+      this.hideButton('submit-answer');
     }
 
     this.trigger('resize');
@@ -349,6 +397,20 @@ export default class AdvancedBlanks extends (H5P.Question as { new(): any; }) {
     this.addQuestionToXAPI(xAPIEvent);
     this.addResponseToXAPI(xAPIEvent);
     this.trigger(xAPIEvent);
+  };
+
+  /**
+   * Trigger xAPI completed event
+   */
+  public triggerXAPICompleted = (): void => {
+    this.triggerXAPIScored(this.clozeController.currentScore, this.clozeController.maxScore, 'completed');
+  };
+
+  /**
+   * Trigger xAPI submitted curriki event
+   */
+  public triggerXAPISubmittedCurriki = (): void => {
+    this.triggerXAPIScored(this.clozeController.currentScore, this.clozeController.maxScore, 'submitted-curriki');
   };
 
   /**

@@ -1,5 +1,6 @@
 ﻿export enum LocalizationLabels {
   showSolutionButton = "showSolutions",
+  submitAnswerButton = "submitAnswer",
   retryButton = "tryAgain",
   checkAllButton = "checkAnswer",
   notFilledOutWarning = "notFilledOut",

@@ -7,6 +7,7 @@ export interface ISettings {
   enableRetry: boolean;
   enableSolutionsButton: boolean;
   enableCheckButton: boolean;
+  disableSubmitButton: boolean;
   autoCheck: boolean;
   caseSensitive: boolean;
   warnSpellingErrors: boolean;
@@ -24,6 +25,7 @@ export class H5PSettings implements ISettings {
   public enableRetry: boolean = true;
   public enableSolutionsButton: boolean = true;
   public enableCheckButton: boolean = true;
+  public disableSubmitButton: boolean = false;
   public autoCheck: boolean = false;
   public caseSensitive: boolean = false;
   public warnSpellingErrors: boolean = true;
@@ -62,10 +64,12 @@ export class H5PSettings implements ISettings {
     this.confirmCheckDialog = h5pConfigData.behaviour.confirmCheckDialog;
     this.confirmRetryDialog = h5pConfigData.behaviour.confirmRetryDialog;
     this.disableImageZooming = h5pConfigData.behaviour.disableImageZooming;
+    this.disableSubmitButton = h5pConfigData.behaviour.disableSubmitButton;
 
     this.enforceLogic();
   }
 
+  
   /**
    * This method sets sensible default values for settings hidden with showWhen
    */

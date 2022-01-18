@@ -438,6 +438,15 @@
         "optional": true
       },
       {
+        "label": "Do not Show Submit Button",
+        "importance": "low",
+        "name": "disableSubmitButton",
+        "type": "boolean",
+        "default": false,
+        "optional": true,
+        "description": "This option is only applies to a standalone activity. The Submit button is required for grade passback to an LMS."
+      },
+      {
         "label": "Enable \"Show solutions\" button",
         "importance": "low",
         "name": "enableSolutionsButton",
@@ -518,6 +527,15 @@
     "name": "checkAnswer",
     "type": "text",
     "default": "Check",
+    "common": true,
+    "optional": true
+  },
+  {
+    "label": "Text for \"Submit\" button",
+    "importance": "low",
+    "name": "submitAnswer",
+    "type": "text",
+    "default": "Submit",
     "common": true,
     "optional": true
   },
