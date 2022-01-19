@@ -111,6 +111,9 @@ export default class AdvancedBlanks extends (H5P.Question as { new(): any; }) {
   private onAutoChecked = () => {
     this.triggerXAPI('interacted');
     this.triggerXAPIAnswered();
+    if (this.clozeController.isFullyFilledOut) {
+      this.triggerXAPICompleted();
+    }
   }
 
   /**
@@ -247,17 +250,26 @@ export default class AdvancedBlanks extends (H5P.Question as { new(): any; }) {
 
     this.toggleButtonVisibility(this.state);
 
-    this.triggerXAPICompleted();
+    if(this.clozeController.isFullyFilledOut) {
+      this.triggerXAPICompleted();
+    }
   };
 
   private onSubmitAnswer = () => {
+    this.submitted = true;
     this.state = States.submittedAnswers;
     this.toggleButtonVisibility(this.state);
     this.triggerXAPISubmittedCurriki();
+    this.addSubmitAnswerFeedback();
+  };
+
+  /**
+   * Add submit answer feedback div
+   */
+  private addSubmitAnswerFeedback =  () => {
     var $submit_message = '<div class="submit-answer-feedback" style = "color: red">Result has been submitted successfully</div>';
     H5P.jQuery('.h5p-question-buttons').after($submit_message);
   };
-
   /**
    * Remove submit answer feedback div
    */
@@ -277,6 +289,9 @@ export default class AdvancedBlanks extends (H5P.Question as { new(): any; }) {
     this.moveToState(States.showingSolutions);
     this.clozeController.showSolutions();
     this.showFeedback();
+    if(this.submitted) {
+      this.removeSubmitAnswerFeedback();
+    }
   };
 
   private onRetry = () => {
