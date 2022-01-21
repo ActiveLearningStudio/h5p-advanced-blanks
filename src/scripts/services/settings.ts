@@ -64,7 +64,10 @@ export class H5PSettings implements ISettings {
     this.confirmCheckDialog = h5pConfigData.behaviour.confirmCheckDialog;
     this.confirmRetryDialog = h5pConfigData.behaviour.confirmRetryDialog;
     this.disableImageZooming = h5pConfigData.behaviour.disableImageZooming;
-    this.disableSubmitButton = h5pConfigData.behaviour.disableSubmitButton;
+
+    if(h5pConfigData.currikisettings) {
+        this.disableSubmitButton = h5pConfigData.currikisettings.disableSubmitButton;
+    }
 
     this.enforceLogic();
   }

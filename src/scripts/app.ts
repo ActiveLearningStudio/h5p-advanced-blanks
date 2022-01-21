@@ -55,7 +55,14 @@ export default class AdvancedBlanks extends (H5P.Question as { new(): any; }) {
    */
   constructor(config: any, contentId: string, contentData: any = {}) {
     super();
-
+    config = H5P.jQuery.extend(true, {}, {
+        currikisettings: {
+            disableSubmitButton: false,
+            currikil10n: {
+                submitAnswer: "Submit"
+            }
+        },
+    }, config);
     this.jQuery = H5P.jQuery;
     this.contentId = contentId;
 
@@ -214,7 +221,7 @@ export default class AdvancedBlanks extends (H5P.Question as { new(): any; }) {
 
     if(!this.settings.disableSubmitButton) {
       // Submit answer button
-      this.addButton('submit-answer', this.localization.getTextFromLabel(LocalizationLabels.submitAnswerButton),
+      this.addButton('submit-answer', this.localization.getObjectForStructure(LocalizationStructures.currikiSettings).currikil10n.submitAnswer,
           this.onSubmitAnswer, true);
     }
 
