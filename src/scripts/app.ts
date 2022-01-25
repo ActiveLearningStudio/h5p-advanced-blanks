@@ -303,7 +303,7 @@ export default class AdvancedBlanks extends (H5P.Question as { new(): any; }) {
 
   private onRetry = () => {
     /* XAPI restart the activityStartTime */
-    this.setActivityStarted();
+    this.activityStartTime = Date.now();
     this.removeFeedback();
     this.removeSubmitAnswerFeedback();
     this.clozeController.reset();
