@@ -331,7 +331,7 @@ export default class AdvancedBlanks extends (H5P.Question as { new(): any; }) {
   private toggleButtonVisibility(state: States) {
     if (this.settings.enableSolutionsButton) {
       if (!this.showSolutionMode && ((state === States.checking)
-        || (this.settings.autoCheck && state === States.ongoing) || (state === States.submittedAnswers))
+        || (this.settings.autoCheck && state === States.ongoing) || (state === States.submittedAnswers && !this.clozeController.isSolved))
         && (!this.settings.showSolutionsRequiresInput || this.clozeController.allBlanksEntered)) {
         this.showButton('show-solution');
       }
@@ -356,7 +356,7 @@ export default class AdvancedBlanks extends (H5P.Question as { new(): any; }) {
     }
 
     if(!this.settings.disableSubmitButton) {
-      if(!this.submitted && (state === States.checking || state === States.showingSolutions)) {
+      if(!this.submitted && (state === States.checking || state === States.showingSolutions || state === States.finished)) {
         this.showButton('submit-answer');
       } else {
         this.hideButton('submit-answer');
