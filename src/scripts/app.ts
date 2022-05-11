@@ -274,8 +274,8 @@ export default class AdvancedBlanks extends (H5P.Question as { new(): any; }) {
    * Add submit answer feedback div
    */
   private addSubmitAnswerFeedback =  () => {
-    var $submit_message = '<div class="submit-answer-feedback" style = "color: red">Result has been submitted successfully</div>';
-    H5P.jQuery('.h5p-question-buttons').after($submit_message);
+    // var $submit_message = '<div class="submit-answer-feedback" style = "color: red">Result has been submitted successfully</div>';
+    // H5P.jQuery('.h5p-question-buttons').after($submit_message);
   };
   /**
    * Remove submit answer feedback div
